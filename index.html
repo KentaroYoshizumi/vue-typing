@@ -14,22 +14,67 @@
                 <div class="marker"></div>
             </div>
             <button v-if="startFlg!=true" class="startButton mb-20" @click="gameStart">START</button>
-            <div class="question mb-20">apple</div>
-            <div class="clear">Clear!</div>
-            <div class="typeFormWrapper mb-20"><input type="text" class="typeForm"></div>
-            <div class="gaugeWrapper mb-20">
-            <div class="gauge"></div>
-            <div>1/5</div>
+            
+            <div v-if="startFlg">
+                <div class="question mb-20">{{ current_question }}</div>
+                <div v-if="current_question_counts == question_counts" current_class="clear">Clear!</div>
+                  <div class="typeFormWrapper mb-20">
+                    <input v-model="typeBox" type="text" class="typeForm">
+                  </div>
+                <div class="gaugeWrapper mb-20">
+                <div v-bind:style="styleObject" class="gauge"></div>
+                </div>
+                <div>{{current_question_counts}}/{{question_counts}}</div>
+            </div>
             </div>
             <script>
                 new Vue({
                     el:"#app",
                     data:{
-                        startFlg:""
+                        startFlg:"",
+                        current_question:"",
+                        questions:[
+                            'apple',
+                            'banana',
+                            'chocolate',
+                            'donut',
+                            'espresso',
+                            ],
+                        typeBox:"",
+                        current_question_counts:0,
+                        question_counts:5
+                    },
+                    computed:{
+                        styleObject:function(){
+                            width = 20 * this.current_question_counts + "%"
+                            if(this.current_question_counts == 5){
+                                color = "#03a9f4"
+                            }else{
+                                color = "orange"
+                            }
+                            return {
+                                'width':width,
+                                'background-color': color
+                            }
+                        }
                     },
                     methods:{
                         gameStart:function(){
                             this.startFlg = true
+                        }
+                    },
+                    mounted:function(){
+                        this.current_question = this.questions[0]
+                        this.question_counts = this.question.length
+                },
+                    watch: {
+                        typeBox:function(e){
+                            if(e == this.current_question){
+                                this.questions.splice(0,1)
+                                this.current_question = this.questions[0]
+                                this.typeBox = ""
+                                this.current_question_counts = this.current_question_counts + 1
+                            }
                         }
                     }
                 })
